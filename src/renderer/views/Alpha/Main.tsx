@@ -8,7 +8,7 @@ function Main() {
   return (
     <>
       {tabs?.map((_, index) => (
-        <TabPanel index={index} />
+        <TabPanel key={index} index={index} />
       ))}
     </>
   );

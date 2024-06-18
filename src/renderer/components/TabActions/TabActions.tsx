@@ -98,12 +98,13 @@ function TabActions() {
   //   };
 
   return (
-    <div className="m-2">
+    <div className="m-2 w-full h-full">
       <div className="w-full flex justify-center items-center">
         <NoDragContainer width="100%">
           <div className="mr-2">
             <ButtonGroup isAttached>
               <IconButton
+                className="hidden sm:block"
                 aria-label="menu"
                 onClick={toggle}
                 icon={<HamburgerIcon />}
