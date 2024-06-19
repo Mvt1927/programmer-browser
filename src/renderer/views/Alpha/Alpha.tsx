@@ -9,7 +9,7 @@ import { ChakraProvider, DarkMode } from '@chakra-ui/react';
 
 function Alpha() {
   return (
-    <div className="w-screen h-screen">
+    <div className="w-screen h-screen flex flex-col overflow-hidden rounded-md">
       <ChakraProvider>
         <DarkMode>
           <TabContextProvider>

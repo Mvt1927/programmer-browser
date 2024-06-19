@@ -9,7 +9,7 @@
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
 import path from 'path';
-import { app, BrowserWindow, shell, ipcMain } from 'electron';
+import { app, BrowserWindow, shell, ipcMain, Tray } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 // import { ElectronBlocker } from '@cliqz/adblocker-electron';
@@ -30,6 +30,8 @@ export default class AppUpdater {
 }
 
 let mainWindow: BrowserWindow | null = null;
+
+let tray = null;
 
 ipcMain.on('ipc-example', async (event, arg) => {
   const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`;
@@ -90,7 +92,8 @@ const createWindow = async () => {
     icon: getAssetPath('icon.png'),
     webPreferences: {
       webviewTag: true,
-      nodeIntegration: false,
+      nodeIntegration: true,
+      contextIsolation: false,
       preload: app.isPackaged
         ? path.join(__dirname, 'preload.js')
         : path.join(__dirname, '../../.erb/dll/preload.js'),
@@ -119,6 +122,41 @@ const createWindow = async () => {
     }
   });
 
+  // Protocol handler for win32
+  // event if app is already running will create new instance
+
+  // toggle always on top
+  ipcMain.on('event-toggle-always-on-top', (event, isPinned) => {
+    mainWindow?.setAlwaysOnTop(isPinned);
+  });
+
+  // hide window when clicking minimize
+
+  ipcMain.on('event-minimize', (event) => {
+    event.preventDefault();
+    mainWindow?.minimize();
+  });
+
+  // toggle maximize window when clicking maximize
+  ipcMain.on('event-toggle-maximize', (event, isMaximized) => {
+    if (isMaximized) {
+      mainWindow?.maximize(); // If not maximized, maximize
+    } else {
+      mainWindow?.unmaximize(); // If maximized, restore to original size
+      mainWindow?.restore(); // If maximized, restore to original size
+    }
+  });
+
+  // open new window
+  ipcMain.on('event-open-new-window', () => {
+    createWindow(); // Create a new window when the event is received
+  });
+
+  // quit app when clicking close
+  ipcMain.on('event-close', () => {
+    mainWindow?.close();
+  });
+
   mainWindow.on('closed', () => {
     mainWindow = null;
   });
@@ -126,6 +164,13 @@ const createWindow = async () => {
   const menuBuilder = new MenuBuilder(mainWindow);
   const menu = menuBuilder.buildMenu();
   mainWindow.webContents.on('context-menu', (_, props) => {
+    const { x, y } = props;
+    menu.popup({ window: mainWindow || undefined, x, y });
+  });
+
+  // open menu when clicking right click
+  ipcMain.on('event-open-menu', (event, props) => {
+    event.preventDefault();
     const { x, y } = props;
     menu.popup({ window: mainWindow || undefined, x, y });
   });

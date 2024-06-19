@@ -9,3 +9,13 @@
   margin: 0;
   padding: 0;
 }
+
+body {
+  font-family: 'Roboto', sans-serif;
+  background-color: #121219;
+}
+
+input.hide-other-when-focus:focus + * .hide-when-other-focus {
+  /* display: none; */
+  background-color: red;
+}

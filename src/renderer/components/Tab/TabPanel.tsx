@@ -37,7 +37,7 @@ function TabPanel({ index }: TabPanelProps) {
 
   return (
     <div
-      className={`webview-wrapper rounded-md w-full h-[calc(100vh-70px)] ${
+      className={`rounded-md w-full h-full px-2 pb-2 ${
         passive() ? 'hidden' : 'block'
       }  `}
     >

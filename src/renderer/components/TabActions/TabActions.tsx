@@ -2,6 +2,7 @@ import { LeftArrow, RefreshIcon, RightArrow } from '../Icons';
 import { createRef, useCallback, useContext, useState } from 'react';
 import { Tab, TabContext } from 'renderer/context/Alpha/TabContext';
 import { SidebarToggleContext } from 'renderer/context/Alpha/SidebarToggleContext';
+const { ipcRenderer } = window.require('electron');
 import NoDragContainer from '../NoDragContainer';
 import {
   ButtonGroup,
@@ -17,6 +18,7 @@ import {
   VscChromeClose,
   VscChromeMaximize,
   VscChromeMinimize,
+  VscChromeRestore,
   VscSettingsGear,
 } from 'react-icons/vsc';
 import {
@@ -96,6 +98,42 @@ function TabActions() {
   //     }
   //     return '';
   //   };
+  const [isPinned, setIsPinned] = useState(false);
+
+  // create new maximize state
+  const [isMaximized, setIsMaximized] = useState(false);
+
+  // toggle always on top
+  const togglePin = () => {
+    const newPinState = !isPinned;
+    setIsPinned(newPinState);
+    ipcRenderer.send('event-toggle-always-on-top', newPinState);
+  };
+
+  // hide window when clicking minimize
+  const minimize = () => {
+    ipcRenderer.send('event-minimize');
+  };
+
+  // toggle maximize window when clicking maximize
+  const maximize = () => {
+    const newMaximizeState = !isMaximized;
+    setIsMaximized(newMaximizeState);
+    ipcRenderer.send('event-toggle-maximize', newMaximizeState);
+
+    //log the new maximize state
+    console.log('maximize state: ', newMaximizeState);
+  };
+
+  // quit app when clicking close
+  const close = () => {
+    ipcRenderer.send('event-close');
+  };
+
+  // open new window
+  const openNewWindow = () => {
+    ipcRenderer.send('event-open-new-window');
+  };
 
   return (
     <div className="m-2 w-full h-full">
@@ -127,6 +165,7 @@ function TabActions() {
             </ButtonGroup>
           </div>
           <Input
+            className=""
             variant={'filled'}
             color={'white'}
             placeholder="Search"
@@ -155,6 +194,8 @@ function TabActions() {
                     icon={<ExternalLinkIcon />}
                     command="Ctrl+N"
                     color={'white'}
+                    onClick={openNewWindow}
+                    isDisabled={true}
                   >
                     New Window
                   </MenuItem>
@@ -165,23 +206,33 @@ function TabActions() {
                   >
                     Open Closed Tab
                   </MenuItem>
-                  <MenuItem icon={<EditIcon />} command="⌘O" color={'white'}>
+                  <MenuItem
+                    icon={<EditIcon />}
+                    command="Ctrl+O"
+                    color={'white'}
+                    onClick={togglePin}
+                  >
                     Toggle Pin To Top
                   </MenuItem>
                 </MenuList>
               </Menu>
               <IconButton
-                aria-label="close"
+                aria-label="minimize"
                 icon={<VscChromeMinimize />}
+                onClick={minimize}
               ></IconButton>
               <IconButton
-                aria-label="close"
-                icon={<VscChromeMaximize />}
+                aria-label="maximize or restore"
+                icon={
+                  isMaximized ? <VscChromeRestore /> : <VscChromeMaximize />
+                }
+                onClick={maximize}
               ></IconButton>
               <IconButton
                 aria-label="close"
                 _hover={{ backgroundColor: 'red' }}
                 icon={<VscChromeClose />}
+                onClick={close}
               ></IconButton>
             </ButtonGroup>
           </div>
