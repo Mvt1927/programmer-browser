@@ -1,21 +1,21 @@
-// import { RefObject, useEffect, useState } from 'react';
+import { RefObject, useEffect, useState } from 'react';
 // import { WebViewOverride } from 'renderer/components/BrowserCollapse/BrowserCollapse';
 
-// const useWebviewReady = (ref: RefObject<WebViewOverride>) => {
-//   const [isReady, setReady] = useState<boolean>(false);
+const useWebviewReady = (ref: RefObject<any>) => {
+  const [isReady, setReady] = useState<boolean>(false);
 
-//   useEffect(() => {
-//     const ready = () => {
-//       setReady(!isReady);
-//     };
-//     ref.current?.addEventListener('dom-ready', ready);
+  useEffect(() => {
+    const ready = () => {
+      setReady(!isReady);
+    };
+    ref.current?.addEventListener('dom-ready', ready);
 
-//     return () => {
-//       ref.current?.removeEventListener('dom-ready', ready);
-//     };
-//   }, [ref.current]);
+    return () => {
+      ref.current?.removeEventListener('dom-ready', ready);
+    };
+  }, [ref.current]);
 
-//   return isReady;
-// };
+  return isReady;
+};
 
-// export default useWebviewReady;
+export default useWebviewReady;

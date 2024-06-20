@@ -1,19 +1,26 @@
-import { createContext, useEffect, useState } from 'react';
+import React, { createContext, useEffect, useState } from 'react';
 import { WebViewOverride } from 'renderer/components/core/types';
 
 export type Tab = {
   keyword: string;
   webviewRef: React.RefObject<WebViewOverride>;
+  icon?: string;
 };
 
 type TabContextProps = {
   tabIndex: number;
   setTabIndex: React.Dispatch<React.SetStateAction<number>>;
   tabs: Tab[];
+  trashTabs: Tab[];
   currentTab: Tab;
   newTab: (tab: Tab) => number;
   search: (value: string) => void;
   removeTab: (index: number) => void;
+  restoreTab: (index: number) => void;
+  restoreLastTab: () => void;
+  clearTrashTabs: () => void;
+  clearTabs: () => void;
+  clearAll: () => void;
 };
 
 type TabContextProviderProps = {
@@ -25,6 +32,7 @@ export const TabContext = createContext<Partial<TabContextProps>>({});
 export function TabContextProvider({ children }: TabContextProviderProps) {
   const [tabIndex, setTabIndex] = useState<number>(0);
   const [tabs, setTabs] = useState<Tab[]>([]);
+  const [trashTabs, setTrashTabs] = useState<Tab[]>([]);
   const [currentTab, setCurrentTab] = useState<Tab>(tabs[tabIndex]);
 
   // Sekme indexi degistiginde aktif sekme degisecek.
@@ -43,8 +51,39 @@ export function TabContextProvider({ children }: TabContextProviderProps) {
   }
 
   function removeTab(index: number): void {
+    const removedTab = tabs?.filter((tab, idx) => idx === index);
     const updatedTabs = tabs?.filter((tab, idx) => idx !== index);
+
+    setTrashTabs([...trashTabs, ...removedTab]);
     setTabs([...updatedTabs]);
+  }
+
+  function restoreTab(index: number): void {
+    const restoredTab = trashTabs?.filter((tab, idx) => idx === index);
+    const updatedTrashTabs = trashTabs?.filter((tab, idx) => idx !== index);
+
+    setTabs([...tabs, ...restoredTab]);
+    setTrashTabs([...updatedTrashTabs]);
+  }
+
+  function restoreLastTab(): void {
+    const lastTab = trashTabs?.pop();
+    if (lastTab !== undefined) {
+      setTabs([...tabs, lastTab]);
+    }
+  }
+
+  function clearTrashTabs(): void {
+    setTrashTabs([]);
+  }
+
+  function clearTabs(): void {
+    setTabs([]);
+  }
+
+  function clearAll(): void {
+    clearTabs();
+    clearTrashTabs();
   }
 
   function search(value: string): void {
@@ -78,6 +117,11 @@ export function TabContextProvider({ children }: TabContextProviderProps) {
         newTab,
         search,
         removeTab,
+        restoreTab,
+        restoreLastTab,
+        clearTabs,
+        clearTrashTabs,
+        clearAll,
       }}
     >
       {children}

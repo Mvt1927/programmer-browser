@@ -1,4 +1,4 @@
-import { createContext, useState } from 'react';
+import React, { createContext, useState } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 // import ShortcutKeys from 'renderer/hooks/shortcut/ShortcutKeys';
 // import useHotkeys from 'renderer/hooks/shortcut/useHotkeys';
@@ -27,6 +27,7 @@ type SearchContextProps = {
   tabs: Tab[];
   setTabs: React.Dispatch<React.SetStateAction<Tab[] | undefined>>;
   closeTab: (id: string) => void;
+  searchRef: React.RefObject<HTMLInputElement>;
 };
 
 export const SearchContext = createContext<Partial<SearchContextProps>>({});
@@ -60,8 +61,11 @@ export const SearchContextProvider = ({
     return searchEnginePath + searchPath;
   };
 
+  const searchRef = React.createRef<HTMLInputElement>();
+
   const search = () => {
     const searchKeyword = getSearchPath(searchEngine, keyword);
+
     const newTab: Tab = {
       tabId: uuidv4(),
       keyword,
@@ -101,6 +105,7 @@ export const SearchContextProvider = ({
         tabs,
         closeTab,
         setTabs,
+        searchRef,
       }}
     >
       {children}

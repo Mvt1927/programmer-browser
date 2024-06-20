@@ -11,12 +11,13 @@ import {
 } from '@chakra-ui/react';
 
 function Sidebar() {
-  const { toggle, isOpen } = useContext(SidebarToggleContext);
+  const { isOpen, setIsOpen } = useContext(SidebarToggleContext);
   return (
     <Drawer
       isOpen={isOpen || false}
       placement="left"
-      onClose={toggle || (() => {})}
+      onClose={setIsOpen?.toggle || (() => {})}
+      closeOnOverlayClick
     >
       <DrawerOverlay />
       <DrawerContent>

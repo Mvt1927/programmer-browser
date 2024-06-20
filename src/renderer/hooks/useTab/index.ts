@@ -7,7 +7,9 @@ type useTabProps = {
 
 function useTab({ index }: useTabProps) {
   const [title, setTitle] = useState<string>('');
-  const [favicon, setFavicon] = useState<string>('');
+  const [favicon, setFavicon] = useState<string>(
+    'https://t0.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=%27%27&size=64'
+  );
   const { tabs } = useContext(TabContext);
 
   useEffect(() => {
@@ -15,7 +17,9 @@ function useTab({ index }: useTabProps) {
       'page-title-updated',
       () => {
         if (tabs?.[index]?.webviewRef?.current) {
-          setTitle(tabs?.[index]?.webviewRef?.current?.getTitle() ?? '');
+          setTitle(
+            tabs?.[index]?.webviewRef?.current?.getTitle() ?? 'Loading...'
+          );
         }
         console.log('page title updated');
       }

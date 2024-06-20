@@ -1,13 +1,19 @@
-import { createContext, useState } from 'react';
+import { useBoolean } from '@chakra-ui/react';
+import { createContext } from 'react';
 
-type SidebarToggleContextProps = {
-  isOpen: boolean;
-  toggle: () => void;
+const props = {
+  isOpen: false,
+  setIsOpen: {
+    on: () => {},
+    off: () => {},
+    toggle: () => {},
+  },
 };
 
-export const SidebarToggleContext = createContext<
-  Partial<SidebarToggleContextProps>
->({});
+type SidebarToggleContextProps = typeof props;
+
+export const SidebarToggleContext =
+  createContext<Partial<SidebarToggleContextProps>>(props);
 
 type SidebarToggleProviderProps = {
   children: React.ReactNode;
@@ -16,14 +22,10 @@ type SidebarToggleProviderProps = {
 export function SidebarToggleProvider({
   children,
 }: SidebarToggleProviderProps) {
-  const [isOpen, setOpen] = useState<boolean>(true);
-
-  const toggle = () => {
-    setOpen(!isOpen);
-  };
+  const [isOpen, setIsOpen] = useBoolean(false);
 
   return (
-    <SidebarToggleContext.Provider value={{ isOpen, toggle }}>
+    <SidebarToggleContext.Provider value={{ isOpen, setIsOpen }}>
       {children}
     </SidebarToggleContext.Provider>
   );
